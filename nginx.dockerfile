@@ -6,7 +6,7 @@ USER root
 
 # Instalar pacotes com a flag --no-cache
 RUN apk update --no-cache && apk add wget
-RUN apk add --no-cache nginx-mod-fastcgi
+# RUN apk add --no-cache nginx-mod-fastcgi
 
 
 # Criar o usuário www-data

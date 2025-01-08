@@ -1,11 +1,11 @@
 server {
     listen       8080;
     server_name  localhost;
+    root   /usr/share/nginx/html;
 
     #access_log  /var/log/nginx/host.access.log  main;
 
     location / {
-        root   /usr/share/nginx/html;
 
         index index.php index.html index.htm;
         try_files $uri $uri/ /index.php?$args; 
@@ -17,13 +17,14 @@ server {
     #
     error_page   500 502 503 504  /50x.html;
     location = /50x.html {
-        root   /usr/share/nginx/html;
+      
     }
 
     # proxy the PHP scripts to Apache listening on 127.0.0.1:80
     #
    
     location ~ \.php$ {
+        
         fastcgi_split_path_info ^(.+?\.php)(/.*)$;  # Divide o caminho do arquivo PHP
 
         try_files $fastcgi_script_name =404;  # Verifica se o script PHP existe

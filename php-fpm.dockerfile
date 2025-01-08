@@ -43,7 +43,9 @@ EXPOSE 9000
 
 USER root 
 # Instalar pacotes com a flag --no-cache
-RUN apk update --no-cache && apk add wget
+
+RUN apk update --no-cache && apk add wget 
+
 
 # Criar o usuário www-data
 RUN adduser -D -g 'www-data' www-data
@@ -54,7 +56,12 @@ RUN  chown -R www-data:www-data /usr/share/nginx/html && \
 chmod -R 755 /usr/share/nginx/html
 # Copia a configuração modificada do PHP-FPM do estágio anterior
 COPY --from=builder /etc/php/8.3/fpm/pool.d/www.conf /etc/php/php-fpm.d/www.conf
-COPY --from=builder /etc/php/8.3/fpm/php.ini /etc/php/8.3/fpm/php.ini
+# COPY --from=builder  /usr/lib/php/20230831/mysqli.so /usr/lib/php/modules/mysqli.so
+# COPY --from=builder  /usr/lib/php/20230831/pdo_mysql.so /etc/php
+# COPY --from=builder /etc/php/8.3/fpm/php.ini /etc/php/php.ini
+# RUN sed -i 's/^\s*;extension=mysqli/extension=mysqli/' /etc/php/php.ini
+# RUN sed -i 's/^\s*;extension=pdo_mysql/extension=pdo_mysql/' /etc/php/php.ini
+
 
 # Define o usuário para o contêiner (não é recomendado rodar como root no contêiner)
 
@@ -63,4 +70,4 @@ COPY --from=builder /etc/php/8.3/fpm/php.ini /etc/php/8.3/fpm/php.ini
 CMD ["php-fpm8.3", "-F"]
 
 # Docker Run Command (opcional, para referência)
-# docker run -d --name php-fpm --network wordpress-net -v wordpress_data:/app -p 9000:9000 php-fpm
+# docker run -d --name php-fpm --network wordpress-net -v wordpress_data:/usr/share/nginx/html -p 9000:9000 php-fpm
