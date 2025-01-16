@@ -1,78 +1,120 @@
 # chainGuard-studies
 
+## Imagens Personalizadas para WordPress com Nginx e PHP Baseadas no ChainGuard
 
-# Imagens Personalizadas para WordPress com Nginx e PHP Baseadas no ChainGuard
+Este repositório fornece imagens Docker personalizadas para hospedar o **WordPress** utilizando **PHP-FPM**, **Nginx** e **MariaDB**, priorizando segurança e desempenho. As imagens são construídas com base em recursos seguros do **ChainGuard** e projetadas para ambientes de produção.
 
-Este repositório contém imagens Docker personalizadas para rodar o **WordPress** com **PHP-FPM**, **Nginx** e **MariaDB** de maneira segura, baseadas no **ChainGuard**. As imagens são projetadas para ambientes de produção, com ênfase na segurança e desempenho.
+---
 
-## Estrutura
+## Estrutura do Repositório
 
-- **Imagem Nginx**: Baseada na imagem `cgr.dev/chainguard/nginx`, otimizada para rodar o WordPress com o módulo `fastcgi` e configurações específicas.
-- **Imagem PHP-FPM**: Baseada na imagem `cgr.dev/chainguard/php`, configurada para rodar o PHP-FPM com o WordPress.
-- **MariaDB**: MariaDB não está incluído diretamente aqui, mas pode ser configurado e executado separadamente para suportar o banco de dados do WordPress.
+- **Imagem Nginx**:
+  - Baseada em `cgr.dev/chainguard/nginx`.
+  - Configurada para rodar o WordPress com suporte ao módulo `fastcgi`.
+  - Inclui otimizações para desempenho e segurança.
 
-## Como usar as imagens
+- **Imagem PHP-FPM**:
+  - Baseada em `cgr.dev/chainguard/php`.
+  - Configurada para processar requisições PHP do WordPress.
 
-### Pré-requisitos
+- **Banco de Dados MariaDB**:
+  - Embora não incluído diretamente neste repositório, você pode usar qualquer imagem oficial ou segura do MariaDB para gerenciar os dados do WordPress.
 
-1. **Docker** instalado no seu sistema.
-2. **Rede Docker** configurada para permitir a comunicação entre os containers.
+---
 
-### Passos para executar
+## Requisitos do Ambiente
 
-#### 1. **Construir as Imagens Personalizadas**
+Antes de iniciar, certifique-se de que possui:
 
-Antes de executar os containers, você precisa construir as imagens personalizadas para o Nginx e PHP-FPM.
+1. **Docker** instalado.
+2. **Rede Docker** configurada para comunicação entre os containers.
+3. **Volumes Docker** para persistência de dados.
 
-Para construir as imagens, use os seguintes comandos na raiz do seu projeto:
+---
+
+## Instruções de Uso
+
+### 1. Construção das Imagens
+
+Construa as imagens personalizadas para o Nginx e PHP-FPM executando os comandos abaixo na raiz do projeto:
 
 ```bash
-# Para a imagem do Nginx
-docker build -t custom-nginx .
+# Construir a imagem Nginx
+docker build -t custom-nginx -f nginx.dockerfile .
 
-# Para a imagem do PHP-FPM
-docker build -t custom-php-fpm .
+# Construir a imagem PHP-FPM
+docker build -t custom-php-fpm -f php-fpm.dockerfile .
 ```
 
-#### 2. **Executar os Containers**
+### 2. Configuração do Banco de Dados
 
-Após construir as imagens, você pode executar os containers para o Nginx e PHP-FPM manualmente:
+Configure um container MariaDB separado para gerenciar o banco de dados do WordPress. Exemplo:
 
-- **Rodar o Nginx:**
+```bash
+docker run -d --name mariadb \
+  --network wordpress-net \
+  -e MYSQL_ROOT_PASSWORD=yourpassword \
+  -e MYSQL_DATABASE=wordpress \
+  -e MYSQL_USER=wordpress \
+  -e MYSQL_PASSWORD=wordpresspassword \
+  mariadb:latest
+```
 
-  O container do Nginx precisa estar configurado para servir o WordPress. Utilize o comando abaixo para rodá-lo:
+### 3. Executando os Containers
 
-  ```bash
-  docker run -d --name nginx \
-    --network wordpress-net \
-    -v wordpress_data:/usr/share/nginx/html \
-    -p 8080:8080 \
-    custom-nginx
-  ```
+#### Nginx:
 
-- **Rodar o PHP-FPM:**
+Inicie o container do Nginx para servir o WordPress:
 
-  O container do PHP-FPM deve ser executado para processar as requisições PHP do WordPress:
+```bash
+docker run -d --name nginx \
+  --network wordpress-net \
+  -v wordpress_data:/usr/share/nginx/html \
+  -p 8080:80 \
+  custom-nginx
+```
 
-  ```bash
-  docker run -d --name php-fpm \
-    --network wordpress-net \
-    -v wordpress_data:/usr/share/nginx/html \
-    -p 9000:9000 \
-    custom-php-fpm
-  ```
+#### PHP-FPM:
 
-#### 3. **Configuração do Banco de Dados**
+Inicie o container do PHP-FPM para processar requisições PHP:
 
-Embora a imagem do MariaDB não esteja incluída aqui, você pode usar qualquer imagem oficial do MariaDB ou outras imagens seguras para rodar o banco de dados necessário para o WordPress. Após configurar o banco de dados, edite o arquivo `wp-config.php` para garantir que o WordPress se conecte corretamente ao banco.
+```bash
+docker run -d --name php-fpm \
+  --network wordpress-net \
+  -v wordpress_data:/usr/share/nginx/html \
+  custom-php-fpm
+```
 
-#### 4. **Acessar o WordPress**
+### 4. Configuração do WordPress
 
-Depois de iniciar os containers do Nginx e PHP-FPM, você pode acessar a instalação do WordPress no seu navegador, em `http://localhost:8080`. Complete o processo de instalação do WordPress conforme solicitado.
+1. Acesse o WordPress pelo navegador em `http://localhost:8080`.
+2. Complete o assistente de configuração.
+3. Certifique-se de configurar as credenciais do banco de dados no arquivo `wp-config.php`.
 
-## Segurança e Melhores Práticas
+---
 
-- **Imagens Baseadas em ChainGuard**: As imagens de **PHP-FPM** e **Nginx** são baseadas em imagens seguras do ChainGuard, que foram auditadas e otimizadas para segurança.
-- **Permissões**: As imagens garantem que os diretórios de aplicação estejam acessíveis apenas por usuários autorizados, minimizando riscos.
-- **Atualizações Regulares**: As imagens são atualizadas frequentemente para corrigir vulnerabilidades e melhorar a segurança.
+## Benefícios do Projeto
+
+- **Segurança Aprimorada**: Utiliza imagens baseadas no ChainGuard, conhecidas por segurança auditada.
+- **Flexibilidade**: Configuração modular para diferentes componentes do sistema.
+- **Desempenho Otimizado**: Configurações ajustadas para uso eficiente de recursos em ambientes de produção.
+
+---
+
+## Melhores Práticas
+
+- Mantenha as imagens e dependências sempre atualizadas.
+- Utilize volumes para persistência de dados do WordPress.
+- Restrinja permissões de acesso a arquivos sensíveis.
+- Monitore os containers regularmente para evitar falhas ou ataques.
+
+---
+
+## Links úteis
+
+- [Documentação do Docker](https://docs.docker.com)
+- [Documentação do WordPress](https://wordpress.org/support/)
+- [ChainGuard](https://chainguard.dev)
+
+
 
