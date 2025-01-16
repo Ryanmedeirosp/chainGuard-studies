@@ -18,7 +18,7 @@ Este repositório fornece imagens Docker personalizadas para hospedar o **WordPr
   - Configurada para processar requisições PHP do WordPress.
 
 - **Banco de Dados MariaDB**:
-  - Embora não incluído diretamente neste repositório, você pode usar qualquer imagem oficial ou segura do MariaDB para gerenciar os dados do WordPress.
+  - Baseada em `cgr.dev/chainguard/mariadb`.
 
 ---
 
