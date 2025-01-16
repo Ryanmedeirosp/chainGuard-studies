@@ -5,9 +5,6 @@ EXPOSE 9000
 
 USER root
 
-# Instalar pacotes adicionais com a flag --no-cache
-RUN apk update --no-cache && apk add wget
-
 # Instalar pacotes de compilação necessários
 RUN apk add --no-cache \
     php-8.3-mysqli \
