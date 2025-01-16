@@ -44,6 +44,9 @@ docker build -t custom-nginx -f nginx.dockerfile .
 
 # Construir a imagem PHP-FPM
 docker build -t custom-php-fpm -f php-fpm.dockerfile .
+
+#Construir a imagem MariaDb
+docker build -t custom-mariadb -f mariadb.dockerfile .
 ```
 
 ### 2. Configuração do Banco de Dados
